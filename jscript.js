@@ -38,9 +38,9 @@ searchBtn.addEventListener('click', async () => {
         alert("Please enter a city name!");
         return;
     }
-    
-    const data = await  getWeather(city);
-   
+
+    const data = await getWeather(city);
+
     if (data && data.cod === 200) {
         countryName.innerText = data.name;
         date.innerText = new Date().toDateString();
@@ -48,32 +48,32 @@ searchBtn.addEventListener('click', async () => {
 
         const iconCode = data.weather[0].icon;
 
-        if(data.main.temp >= 30){
+        if (data.main.temp >= 30) {
             weatherImage.src = `https://openweathermap.org/img/wn/${iconCode}.png`
             temperature.innerText = data.main.temp + "°C";
             weatherDescription.innerText = "Sunny Day"
         }
-        else if(data.main.temp >= 20 && data.main.temp < 30){
-             weatherImage.src = `https://openweathermap.org/img/wn/${iconCode}.png`
-             temperature.innerText = data.main.temp + "°C";
-            weatherDescription.innerText = data.weather[0].description;
-        }
-
-        else if(data.main.temp > 15){
+        else if (data.main.temp >= 20 && data.main.temp < 30) {
             weatherImage.src = `https://openweathermap.org/img/wn/${iconCode}.png`
             temperature.innerText = data.main.temp + "°C";
             weatherDescription.innerText = data.weather[0].description;
-       }
-       
-        else if(data.main.temp > 5 && data.main.temp < 15){
-              weatherImage.src = `https://openweathermap.org/img/wn/${iconCode}.png`
-             temperature.innerText = data.main.temp + "°C";
-             weatherDescription.innerText = data.weather[0].description
         }
-        else{
-             weatherImage.src = `https://openweathermap.org/img/wn/${iconCode}.png`
-             temperature.innerText = data.main.temp + "°C";
-             weatherDescription.innerText = data.weather[0].description
+
+        else if (data.main.temp > 15) {
+            weatherImage.src = `https://openweathermap.org/img/wn/${iconCode}.png`
+            temperature.innerText = data.main.temp + "°C";
+            weatherDescription.innerText = data.weather[0].description;
+        }
+
+        else if (data.main.temp > 5 && data.main.temp < 15) {
+            weatherImage.src = `https://openweathermap.org/img/wn/${iconCode}.png`
+            temperature.innerText = data.main.temp + "°C";
+            weatherDescription.innerText = data.weather[0].description
+        }
+        else {
+            weatherImage.src = `https://openweathermap.org/img/wn/${iconCode}.png`
+            temperature.innerText = data.main.temp + "°C";
+            weatherDescription.innerText = data.weather[0].description
         }
 
 
@@ -89,7 +89,92 @@ searchBtn.addEventListener('click', async () => {
     else {
         console.error("Not a valid city name")
         alert("Not a city name");
-    } 
+    }
 
 
 })
+
+// to get my location using the lat and lon
+
+async function getCountryFromLatLng(lat, lon) {
+    try {
+      //Reverse geocode lat/lon to get country name
+      const reverseRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+      const reverseData = await reverseRes.json();
+  
+      const countryName = reverseData.address.country;
+      console.log("You are in:", countryName);
+  
+      //Fetch country details from restcountries using the name
+      const countryRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${countryName}&appid=a86fcc0d3b6e4a62fb57b5bd6546e50c&units=metric`);
+      const countryData = await countryRes.json();
+  
+      console.log("Country details:", countryData);
+      console.log(reverseData)
+      return countryData;
+    } catch (error) {
+      console.error("Error fetching country by lat/lon:", error);
+      return null;
+    }
+  }
+
+// get the lat and log from here
+  navigator.geolocation.getCurrentPosition(
+    async (position) => {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+  
+      const countryData = await getCountryFromLatLng(lat, lon);
+      if (countryData) {
+        // do something with countryData, like display card  
+        countryName.innerText = countryData.name;
+
+        date.innerText = new Date().toDateString();
+
+
+        const iconCode = countryData.weather[0].icon;
+
+        if (countryData.main.temp >= 30) {
+            weatherImage.src = `https://openweathermap.org/img/wn/${iconCode}.png`
+            temperature.innerText = countryData.main.temp + "°C";
+            weatherDescription.innerText = "Sunny Day"
+        }
+        else if (countryData.main.temp >= 20 && countryData.main.temp < 30) {
+            weatherImage.src = `https://openweathermap.org/img/wn/${iconCode}.png`
+            temperature.innerText = countryData.main.temp + "°C";
+            weatherDescription.innerText = countryData.weather[0].description;
+        }
+
+        else if (countryData.main.temp > 15) {
+            weatherImage.src = `https://openweathermap.org/img/wn/${iconCode}.png`
+            temperature.innerText = countryData.main.temp + "°C";
+            weatherDescription.innerText = countryData.weather[0].description;
+        }
+
+        else if (countryData.main.temp > 5 && countryData.main.temp < 15) {
+            weatherImage.src = `https://openweathermap.org/img/wn/${iconCode}.png`
+            temperature.innerText = countryData.main.temp + "°C";
+            weatherDescription.innerText = countryData.weather[0].description
+        }
+        else {
+            weatherImage.src = `https://openweathermap.org/img/wn/${iconCode}.png`
+            temperature.innerText = countryData.main.temp + "°C";
+            weatherDescription.innerText = countryData.weather[0].description
+        }
+
+
+        // the humidity wind speed and pressure output
+
+        humidity.innerText = countryData.main.humidity + "g/m³";
+        pressure.innerText = countryData.main.pressure + "Pa";
+        windSpeed.innerText = countryData.wind.speed + "m/s";
+  
+        // console.log("Country name:", countryData.name);
+      }
+    },
+    (err) => {
+      console.error("Geolocation error:", err);
+    }
+  );
+  
+  

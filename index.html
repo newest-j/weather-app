@@ -11,6 +11,7 @@
 
 <body>
     <div class="container py-5">
+        <!-- Search Bar -->
         <div class="row justify-content-center mb-4">
             <div class="col-md-6">
                 <div class="input-group">
@@ -20,25 +21,28 @@
             </div>
         </div>
 
+        <!-- Main Weather Card -->
         <div class="row justify-content-center">
             <div class="col-md-6">
                 <div class="weather-card text-center">
                     <h2 id="countryname">Country Name</h2>
                     <p class="text-muted-light" id="date">Current Date</p>
-                    <img src="https://openweathermap.org/img/wn/01d.png" id="image" class="weather-icon" alt="weather image" />
+                    <img src="https://openweathermap.org/img/wn/01d.png" id="image" class="weather-icon"
+                        alt="weather image" />
                     <h1 class="display-3" id="temp">0°C</h1>
-                    <p class="lead" id="weatherdetails">Staus</p>
+                    <p class="lead" id="weatherdetails">Weather Status</p>
                 </div>
             </div>
         </div>
 
+        <!-- Weather Info -->
         <div class="row justify-content-center mt-4">
             <div class="col-md-8">
                 <div class="row text-center">
                     <div class="col-4">
                         <div class="weather-card p-3">
                             <p>Humidity</p>
-                            <img src="images/icons8-humidity-64.png"  class="icon" alt="Humidity" />
+                            <img src="images/icons8-humidity-64.png" class="icon" alt="Humidity" />
                             <p id="humidity">g/m³</p>
                         </div>
                     </div>
@@ -65,4 +69,5 @@
 </body>
 
 <script src="jscript.js"></script>
+
 </html>
