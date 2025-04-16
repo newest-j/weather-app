@@ -46,9 +46,6 @@ input.form-control {
 .lead {
   font-size: 1.2rem;
 }
-.sun-track small {
-  font-weight: 500;
-}
 
 
 @media (max-width: 767px) {
