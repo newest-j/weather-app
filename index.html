@@ -27,10 +27,11 @@
                 <div class="weather-card text-center">
                     <h2 id="countryname" class="text-white">Country Name</h2>
                     <p class="text-muted-light" id="date">Current Date</p>
+                    <p class="lead text-white" id="weatherdetails">Weather Status</p>
                     <img src="https://openweathermap.org/img/wn/01d.png" id="image" class="weather-icon"
                         alt="weather image" />
                     <h1 class="display-3 text-white" id="temp">0°C</h1>
-                    <p class="lead text-white" id="weatherdetails">Weather Status</p>
+                    <p class="text-white" id="feeltemp">0°C</p>
                 </div>
             </div>
         </div>
@@ -63,6 +64,25 @@
                 </div>
             </div>
         </div>
+
+
+
+        <!-- Sunrise and Sunset -->
+        <div class="sun-track text-white mt-4">
+            <p class="mb-1"> Sunrise to Sunset Tracker</p>
+            <div class="progress" style="height: 20px; background-color: #e0e0e0; border-radius: 10px;">
+                <div id="sunProgress" class="progress-bar bg-warning text-dark" role="progressbar"
+                    style="width: 0%; transition: width 1s; border-radius: 10px;">
+                </div>
+            </div>
+            <div class="d-flex justify-content-between mt-1">
+                <small id="sunriseTime"> --:--</small>
+                <small id="sunsetTime"> --:--</small>
+            </div>
+        </div>
+
+
+
     </div>
 
 
