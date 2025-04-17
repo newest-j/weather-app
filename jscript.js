@@ -29,6 +29,7 @@ function updateSunProgress(sunriseUnit, sunsetUnit) {
     const totalDuration = sunsetUnit - sunriseUnit;
     const currentProgress = now - sunriseUnit;
     const percentage = Math.min(Math.max((currentProgress / totalDuration) * 100, 0), 100);
+    // console.log(percentage)
 
     const sunProgressBar = document.getElementById("sunProgress");
     sunProgressBar.style.width = `${percentage}%`;
@@ -38,8 +39,8 @@ function updateSunProgress(sunriseUnit, sunsetUnit) {
     document.getElementById("sunsetTime").innerText = formatTime(sunsetUnit);
 }
 
-function formatTime(unixTimestamp) {
-    const date = new Date(unixTimestamp * 1000);
+function formatTime(unitTimestamp) {
+    const date = new Date(unitTimestamp * 1000);
     const hours = date.getHours().toString().padStart(2, '0');
     const minutes = date.getMinutes().toString().padStart(2, '0');
     return `${hours}:${minutes}`;
@@ -82,6 +83,10 @@ async function getWeather(city) {
 }
 
 
+
+
+
+
 // Usage
 searchBtn.addEventListener('click', async () => {
     let city = inputValue.value.trim();
@@ -95,7 +100,7 @@ searchBtn.addEventListener('click', async () => {
     const weatherData = await getNextWeather(city);
     const data = await getWeather(city);
     updateSunProgress(data.sys.sunrise, data.sys.sunset);
-    console.log(weatherData);
+    // console.log(weatherData);
 
 
     // next weatherdata output
@@ -208,7 +213,7 @@ searchBtn.addEventListener('click', async () => {
                 windSpeed.innerText = `${closestTodayForecast.wind.speed}m/s`;
             }
 
-             
+
 
         }
 
@@ -258,7 +263,7 @@ navigator.geolocation.getCurrentPosition(
         const lon = position.coords.longitude;
 
         const countryData = await getCountryFromLatLng(lat, lon);
-        
+
 
         if (countryData.cod) {
 
