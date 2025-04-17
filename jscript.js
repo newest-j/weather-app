@@ -125,7 +125,6 @@ searchBtn.addEventListener('click', async () => {
         // loop through the weatherdata list
         weatherData.list.forEach(countryWeather => {
             const weatherDate = new Date(countryWeather.dt_txt);
-            const currentDate = new Date();
             const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
             const weatherIcon = countryWeather.weather[0].icon;
             // next
