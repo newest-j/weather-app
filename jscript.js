@@ -236,12 +236,12 @@ searchBtn.addEventListener('click', async () => {
 async function getCountryFromLatLng(lat, lon) {
     try {
         //Reverse geocode lat/lon to get country name
-        const reverseRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+        const reverseRes = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`);
         const reverseData = await reverseRes.json();
-        // console.log(reverseData)
+        console.log(reverseData);
 
-        const countryName = reverseData.address.country;
-        // console.log("You are in:", countryName);
+        const countryName = reverseData.city;
+        console.log("You are in:", countryName);
 
 
         const countryRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${countryName}&appid=a86fcc0d3b6e4a62fb57b5bd6546e50c&units=metric`);
