@@ -22,27 +22,6 @@ const nextDescriptionAddTwo = document.getElementById("desc3");
 const nextWeatherAddTwo = document.getElementById("next2");
 const nextTempAddTwo = document.getElementById("temp3");
 
-// fetch the weather api
-async function getWeather(city) {
-    const API_KEY = "a86fcc0d3b6e4a62fb57b5bd6546e50c";
-    try {
-        const response = await fetch(
-            `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`
-        );
-        const data = await response.json();
-        // console.log(data);
-        // console.log(`Weather in ${city}:`);
-        // console.log("Temperature:", data.main.temp, "°C");
-        // console.log("Description:", data.weather[0].description);
-        // console.log("Humidity:", data.main.humidity, "%");
-
-        return data;
-    } catch (error) {
-        console.error("Error fetching weather:", error);
-        return null;
-    }
-}
-
 // sunrise and sunset function function
 function updateSunProgress(sunriseUnit, sunsetUnit) {
     const now = Math.floor(Date.now() / 1000);
@@ -85,6 +64,24 @@ async function getNextWeather(city) {
 }
 
 
+// fetch this to get the sunrise and sunset
+
+async function getWeather(city) {
+    try {
+        const response = await fetch(
+
+            `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=a86fcc0d3b6e4a62fb57b5bd6546e50c&units=metric`
+        );
+        const data = await response.json();
+        // console.log(data);
+        return data;
+    } catch (error) {
+        console.error("Error fetching weather:", error);
+        return null;
+    }
+}
+
+
 // Usage
 searchBtn.addEventListener('click', async () => {
     let city = inputValue.value.trim();
@@ -95,70 +92,11 @@ searchBtn.addEventListener('click', async () => {
         return;
     }
 
-    const data = await getWeather(city);
     const weatherData = await getNextWeather(city);
+    const data = await getWeather(city);
+    updateSunProgress(data.sys.sunrise, data.sys.sunset);
     console.log(weatherData);
 
-    if (data && data.cod === 200) {
-        countryName.innerText = data.name;
-        date.innerText = new Date().toDateString();
-
-
-        const iconCode = data.weather[0].icon;
-
-        if (data.main.temp >= 30) {
-            weatherImage.src = `https://openweathermap.org/img/wn/${iconCode}.png`
-            temperature.innerText = data.main.temp + "°C";
-            feelTemp.innerText = "feels-like " + data.main.feels_like + "°C";
-            weatherDescription.innerText = data.weather[0].description;
-        }
-        else if (data.main.temp >= 20 && data.main.temp < 30) {
-            weatherImage.src = `https://openweathermap.org/img/wn/${iconCode}.png`
-            temperature.innerText = data.main.temp + "°C";
-            feelTemp.innerText = "feels-like " + data.main.feels_like + "°C";
-            weatherDescription.innerText = data.weather[0].description;
-        }
-
-        else if (data.main.temp > 15) {
-            weatherImage.src = `https://openweathermap.org/img/wn/${iconCode}.png`
-            temperature.innerText = data.main.temp + "°C";
-            feelTemp.innerText = "feels-like " + data.main.feels_like + "°C";
-            weatherDescription.innerText = data.weather[0].description;
-        }
-
-        else if (data.main.temp > 5 && data.main.temp < 15) {
-            weatherImage.src = `https://openweathermap.org/img/wn/${iconCode}.png`
-            temperature.innerText = data.main.temp + "°C";
-            feelTemp.innerText = "feels-like " + data.main.feels_like + "°C";
-            weatherDescription.innerText = data.weather[0].description
-        }
-        else {
-            weatherImage.src = `https://openweathermap.org/img/wn/${iconCode}.png`
-            temperature.innerText = data.main.temp + "°C";
-            feelTemp.innerText = "feels-like " + data.main.feels_like + "°C";
-            weatherDescription.innerText = data.weather[0].description
-        }
-
-
-        // the humidity wind speed and pressure output
-
-        humidity.innerText = data.main.humidity + "g/m³";
-        pressure.innerText = data.main.pressure + "Pa";
-        windSpeed.innerText = data.wind.speed + "m/s";
-
-
-
-        updateSunProgress(data.sys.sunrise, data.sys.sunset);
-
-
-
-
-
-    }
-    else {
-        console.error("Not a valid city name")
-        alert("Not a city name");
-    }
 
     // next weatherdata output
     if (weatherData.cod) {
@@ -187,6 +125,7 @@ searchBtn.addEventListener('click', async () => {
         // loop through the weatherdata list
         weatherData.list.forEach(countryWeather => {
             const weatherDate = new Date(countryWeather.dt_txt);
+            const currentDate = new Date();
             const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
             const weatherIcon = countryWeather.weather[0].icon;
             // next
@@ -201,11 +140,11 @@ searchBtn.addEventListener('click', async () => {
                 nextDescription.innerText = countryWeather.weather[0].description;
             }
             // day after tomorrow
-            else if(
+            else if (
                 weatherDate.getDate() === tomorrowDateAddOne &&
                 weatherDate.getMonth() === tomorrowMonthAddOne &&
                 weatherDate.getFullYear() === tomorrowYearAddOne
-            ){
+            ) {
                 nextAddOne.innerText = days[weatherDate.getDay()];
                 nextWeatherAddOne.src = `https://openweathermap.org/img/wn/${weatherIcon}.png`;
                 nextTempAddOne.innerText = countryWeather.main.temp + "°C";
@@ -213,11 +152,11 @@ searchBtn.addEventListener('click', async () => {
             }
 
             // two days after
-            else if(
+            else if (
                 weatherDate.getDate() === tomorrowDateAddTwo &&
                 weatherDate.getMonth() === tomorrowMonthAddTwo &&
                 weatherDate.getFullYear() === tomorrowYearAddTwo
-            ){
+            ) {
                 nextAddTwo.innerText = days[weatherDate.getDay()];
                 nextWeatherAddTwo.src = `https://openweathermap.org/img/wn/${weatherIcon}.png`;
                 nextTempAddTwo.innerText = countryWeather.main.temp + "°C";
@@ -225,9 +164,57 @@ searchBtn.addEventListener('click', async () => {
             }
 
 
+            // output todays weather
 
 
-        });
+            countryName.innerText = weatherData.city.name;
+            date.innerText = new Date().toDateString();
+
+            // to get the weathewr data by time
+            let closestTodayForecast = null;
+            let minTimeDiff = Infinity;
+            const now = new Date();
+
+            weatherData.list.forEach(forecast => {
+                const forecastDate = new Date(forecast.dt_txt);
+
+                // Check if it's today's forecast
+                if (
+                    forecastDate.getDate() === now.getDate() &&
+                    forecastDate.getMonth() === now.getMonth() &&
+                    forecastDate.getFullYear() === now.getFullYear()
+                ) {
+                    const timeDiff = Math.abs(forecastDate.getTime() - now.getTime());
+
+                    if (timeDiff < minTimeDiff) {
+                        minTimeDiff = timeDiff;
+                        closestTodayForecast = forecast;
+                    }
+                }
+            });
+
+            if (closestTodayForecast) {
+                const icon = closestTodayForecast.weather[0].icon;
+
+                countryName.innerText = weatherData.city.name;
+                date.innerText = now.toDateString();
+                weatherImage.src = `https://openweathermap.org/img/wn/${icon}.png`;
+                temperature.innerText = `${closestTodayForecast.main.temp}°C`;
+                feelTemp.innerText = `feels-like ${closestTodayForecast.main.feels_like}°C`;
+                weatherDescription.innerText = closestTodayForecast.weather[0].description;
+
+                // These are the extra parts you added:
+                humidity.innerText = `${closestTodayForecast.main.humidity}g/m³`;
+                pressure.innerText = `${closestTodayForecast.main.pressure}Pa`;
+                windSpeed.innerText = `${closestTodayForecast.wind.speed}m/s`;
+            }
+
+             
+
+        }
+
+
+        );
     }
 
 
@@ -252,17 +239,12 @@ async function getCountryFromLatLng(lat, lon) {
         const countryName = reverseData.address.country;
         // console.log("You are in:", countryName);
 
-        //Fetch country details from restcountries using the name
-        const countryRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${countryName}&appid=a86fcc0d3b6e4a62fb57b5bd6546e50c&units=metric`);
+
+        const countryRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${countryName}&appid=a86fcc0d3b6e4a62fb57b5bd6546e50c&units=metric`);
         const countryData = await countryRes.json();
 
 
-        // const weatherNext = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${countryName}&appid=a86fcc0d3b6e4a62fb57b5bd6546e50c&units=metric`)
-        // const weatherNextData = await weatherNext.json();
 
-        // console.log("Country details:", countryData);
-        // console.log(reverseData)
-        // console.log(weatherNextData)
         return countryData;
     } catch (error) {
         console.error("Error fetching country by lat/lon:", error);
@@ -277,65 +259,130 @@ navigator.geolocation.getCurrentPosition(
         const lon = position.coords.longitude;
 
         const countryData = await getCountryFromLatLng(lat, lon);
-        if (countryData) {
-            // do something with countryData, like display card  
-            countryName.innerText = countryData.name;
+        
 
-            date.innerText = new Date().toDateString();
+        if (countryData.cod) {
+
+            // this is to fetch for tommorrow 
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowDate = tomorrow.getDate();
+            const tomorrowMonth = tomorrow.getMonth();
+            const tomorrowYear = tomorrow.getFullYear();
+
+            // this is to fetch for day after tommorrow
+            const tomorrowAddOne = new Date();
+            tomorrowAddOne.setDate(tomorrowAddOne.getDate() + 2);
+            const tomorrowDateAddOne = tomorrowAddOne.getDate();
+            const tomorrowMonthAddOne = tomorrowAddOne.getMonth();
+            const tomorrowYearAddOne = tomorrowAddOne.getFullYear();
+
+            // this is to fetch for two days later
+            const tomorrowAddTwo = new Date();
+            tomorrowAddTwo.setDate(tomorrowAddTwo.getDate() + 3);
+            const tomorrowDateAddTwo = tomorrowAddTwo.getDate();
+            const tomorrowMonthAddTwo = tomorrowAddTwo.getMonth();
+            const tomorrowYearAddTwo = tomorrowAddTwo.getFullYear();
+
+            // loop through the weatherdata list
+            countryData.list.forEach(countryWeather => {
+                const weatherDate = new Date(countryWeather.dt_txt);
+                const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+                const weatherIcon = countryWeather.weather[0].icon;
+                // next
+                if (
+                    weatherDate.getDate() === tomorrowDate &&
+                    weatherDate.getMonth() === tomorrowMonth &&
+                    weatherDate.getFullYear() === tomorrowYear
+                ) {
+                    nextDay.innerText = days[weatherDate.getDay()]
+                    nextWeather.src = `https://openweathermap.org/img/wn/${weatherIcon}.png`;
+                    nextTemp.innerText = countryWeather.main.temp + "°C";
+                    nextDescription.innerText = countryWeather.weather[0].description;
+                }
+                // day after tomorrow
+                else if (
+                    weatherDate.getDate() === tomorrowDateAddOne &&
+                    weatherDate.getMonth() === tomorrowMonthAddOne &&
+                    weatherDate.getFullYear() === tomorrowYearAddOne
+                ) {
+                    nextAddOne.innerText = days[weatherDate.getDay()];
+                    nextWeatherAddOne.src = `https://openweathermap.org/img/wn/${weatherIcon}.png`;
+                    nextTempAddOne.innerText = countryWeather.main.temp + "°C";
+                    nextDescriptionAddOne.innerText = countryWeather.weather[0].description;
+                }
+
+                // two days after
+                else if (
+                    weatherDate.getDate() === tomorrowDateAddTwo &&
+                    weatherDate.getMonth() === tomorrowMonthAddTwo &&
+                    weatherDate.getFullYear() === tomorrowYearAddTwo
+                ) {
+                    nextAddTwo.innerText = days[weatherDate.getDay()];
+                    nextWeatherAddTwo.src = `https://openweathermap.org/img/wn/${weatherIcon}.png`;
+                    nextTempAddTwo.innerText = countryWeather.main.temp + "°C";
+                    nextDescriptionAddTwo.innerText = countryWeather.weather[0].description;
+                }
 
 
-            const iconCode = countryData.weather[0].icon;
+                // output todays weather
+                countryName.innerText = countryData.city.name;
+                date.innerText = new Date().toDateString();
 
-            if (countryData.main.temp >= 30) {
-                weatherImage.src = `https://openweathermap.org/img/wn/${iconCode}.png`
-                temperature.innerText = countryData.main.temp + "°C";
-                feelTemp.innerText = "feels-like " + countryData.main.feels_like + "°C";
-                weatherDescription.innerText = countryData.weather[0].description;
+                // to get the weathewr data by time
+
+                let closestTodayForecast = null;
+                let minTimeDiff = Infinity;
+                const now = new Date();
+
+                countryData.list.forEach(forecast => {
+                    const forecastDate = new Date(forecast.dt_txt);
+
+                    // Check if it's today's forecast
+                    if (
+                        forecastDate.getDate() === now.getDate() &&
+                        forecastDate.getMonth() === now.getMonth() &&
+                        forecastDate.getFullYear() === now.getFullYear()
+                    ) {
+                        const timeDiff = Math.abs(forecastDate.getTime() - now.getTime());
+
+                        if (timeDiff < minTimeDiff) {
+                            minTimeDiff = timeDiff;
+                            closestTodayForecast = forecast;
+                        }
+                    }
+                });
+
+                if (closestTodayForecast) {
+                    const icon = closestTodayForecast.weather[0].icon;
+
+                    countryName.innerText = countryData.city.name;
+                    date.innerText = now.toDateString();
+                    weatherImage.src = `https://openweathermap.org/img/wn/${icon}.png`;
+                    temperature.innerText = `${closestTodayForecast.main.temp}°C`;
+                    feelTemp.innerText = `feels-like ${closestTodayForecast.main.feels_like}°C`;
+                    weatherDescription.innerText = closestTodayForecast.weather[0].description;
+
+                    // These are the extra parts you added:
+                    humidity.innerText = `${closestTodayForecast.main.humidity}g/m³`;
+                    pressure.innerText = `${closestTodayForecast.main.pressure}Pa`;
+                    windSpeed.innerText = `${closestTodayForecast.wind.speed}m/s`;
+                }
+
+
+
             }
-            else if (countryData.main.temp >= 20 && countryData.main.temp < 30) {
-                weatherImage.src = `https://openweathermap.org/img/wn/${iconCode}.png`
-                temperature.innerText = countryData.main.temp + "°C";
-                feelTemp.innerText = "feels-like " + countryData.main.feels_like + "°C";
-                weatherDescription.innerText = countryData.weather[0].description;
-            }
-
-            else if (countryData.main.temp > 15) {
-                weatherImage.src = `https://openweathermap.org/img/wn/${iconCode}.png`
-                temperature.innerText = countryData.main.temp + "°C";
-                feelTemp.innerText = "feels-like " + countryData.main.feels_like + "°C";
-                weatherDescription.innerText = countryData.weather[0].description;
-            }
-
-            else if (countryData.main.temp > 5 && countryData.main.temp < 15) {
-                weatherImage.src = `https://openweathermap.org/img/wn/${iconCode}.png`
-                temperature.innerText = countryData.main.temp + "°C";
-                feelTemp.innerText = "feels-like " + countryData.main.feels_like + "°C";
-                weatherDescription.innerText = countryData.weather[0].description
-            }
-            else {
-                weatherImage.src = `https://openweathermap.org/img/wn/${iconCode}.png`
-                temperature.innerText = countryData.main.temp + "°C";
-                feelTemp.innerText = "feels-like " + countryData.main.feels_like + "°C";
-                weatherDescription.innerText = countryData.weather[0].description
-            }
 
 
-            // the humidity wind speed and pressure output
-
-            humidity.innerText = countryData.main.humidity + "g/m³";
-            pressure.innerText = countryData.main.pressure + "Pa";
-            windSpeed.innerText = countryData.wind.speed + "m/s";
-
-
-            updateSunProgress(countryData.sys.sunrise, countryData.sys.sunset);
-
-
-
-
-
-
-            // console.log("Country name:", countryData.name);
+            );
         }
+
+        else {
+            console.error("Could not fetch")
+        }
+
+
+
     },
     (err) => {
         console.error("Geolocation error:", err);
