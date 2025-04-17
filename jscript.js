@@ -392,3 +392,48 @@ navigator.geolocation.getCurrentPosition(
         console.error("Geolocation error:", err);
     }
 );
+
+const suggestionsList = document.getElementById("suggestions");
+
+input.addEventListener('input', async () => {
+  const value = input.value.trim();
+
+  suggestionsList.innerHTML = "";
+
+  if (!value) return;
+
+  try {
+    const response = await fetch(`https://restcountries.com/v3.1/name/${value}`);
+    const data = await response.json();
+
+    // Filter countries
+    const filtered = data.filter(c =>
+      c.name.common.toLowerCase().startsWith(value.toLowerCase())
+    );
+
+    filtered.forEach(country => {
+      const li = document.createElement("li");
+      li.className = "list-group-item list-group-item-action";
+      li.textContent = country.name.common;
+
+      li.addEventListener("click", () => {
+        input.value = country.name.common;
+        suggestionsList.innerHTML = "";
+        searchBtn.click(); 
+      });
+
+      suggestionsList.appendChild(li);
+    });
+
+    return filtered;
+  } catch (error) {
+    console.error("Error fetching countries:", error);
+    return null;
+  }
+});
+
+document.addEventListener("click", (e) => {
+  if (e.target !== input) {
+    suggestionsList.innerHTML = "";
+  }
+});
