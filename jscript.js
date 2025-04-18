@@ -238,10 +238,10 @@ async function getCountryFromLatLng(lat, lon) {
         //Reverse geocode lat/lon to get country name
         const reverseRes = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`);
         const reverseData = await reverseRes.json();
-        console.log(reverseData);
+        // console.log(reverseData);
 
         const countryName = reverseData.city;
-        console.log("You are in:", countryName);
+        // console.log("You are in:", countryName);
 
 
         const countryRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${countryName}&appid=a86fcc0d3b6e4a62fb57b5bd6546e50c&units=metric`);
@@ -344,9 +344,9 @@ navigator.geolocation.getCurrentPosition(
 
                     // Check if it's today's forecast
                     if (
-                        forecastDate.getDate() === now.getDate() &&
-                        forecastDate.getMonth() === now.getMonth() &&
-                        forecastDate.getFullYear() === now.getFullYear()
+                        forecastDate.getUTCDate() === now.getUTCDate() &&
+                        forecastDate.getUTCMonth() === now.getUTCMonth() &&
+                        forecastDate.getUTCFullYear() === now.getUTCFullYear()
                     ) {
                         const timeDiff = Math.abs(forecastDate.getTime() - now.getTime());
 
@@ -393,47 +393,51 @@ navigator.geolocation.getCurrentPosition(
     }
 );
 
+// the autocomplete
 const suggestionsList = document.getElementById("suggestions");
 
 input.addEventListener('input', async () => {
-  const value = input.value.trim();
+    const value = input.value.trim();
 
-  suggestionsList.innerHTML = "";
+    suggestionsList.innerHTML = "";
 
-  if (!value) return;
+    if (!value) return;
 
-  try {
-    const response = await fetch(`https://restcountries.com/v3.1/name/${value}`);
-    const data = await response.json();
+    try {
+        const response = await fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${value}&limit=5&appid=a86fcc0d3b6e4a62fb57b5bd6546e50c`);
+        const data = await response.json();
+        console.log(data);
 
-    // Filter countries
-    const filtered = data.filter(c =>
-      c.name.common.toLowerCase().startsWith(value.toLowerCase())
-    );
+        const added = [];
 
-    filtered.forEach(country => {
-      const li = document.createElement("li");
-      li.className = "list-group-item list-group-item-action";
-      li.textContent = country.name.common;
+        data.forEach(city => {
+            const label = `${city.name}, ${city.state ? city.state + ', ' : ''}${city.country}`;
 
-      li.addEventListener("click", () => {
-        input.value = country.name.common;
-        suggestionsList.innerHTML = "";
-        searchBtn.click(); 
-      });
+            // Avoid duplicates manually
+            if (!added.includes(label.toLowerCase())) {
+                added.push(label.toLowerCase());
 
-      suggestionsList.appendChild(li);
-    });
+                const li = document.createElement("li");
+                li.className = "list-group-item list-group-item-action";
+                li.textContent = label;
 
-    return filtered;
-  } catch (error) {
-    console.error("Error fetching countries:", error);
-    return null;
-  }
+                li.addEventListener("click", () => {
+                    input.value = city.name;
+                    suggestionsList.innerHTML = "";
+                    searchBtn.click();
+                });
+
+                suggestionsList.appendChild(li);
+            }
+        });
+
+    } catch (error) {
+        console.error("Error fetching cities:", error);
+    }
 });
 
 document.addEventListener("click", (e) => {
-  if (e.target !== input) {
-    suggestionsList.innerHTML = "";
-  }
+    if (e.target !== input) {
+        suggestionsList.innerHTML = "";
+    }
 });
